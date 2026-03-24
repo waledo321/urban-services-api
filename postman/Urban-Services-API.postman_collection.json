@@ -1,0 +1,167 @@
+{
+  "info": {
+    "name": "Urban Services API",
+    "description": "REST API collection for Smart Urban Services Management Platform backend.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test('Unified response has envelope keys', function () {",
+          "    const jsonData = pm.response.json();",
+          "    pm.expect(jsonData).to.have.property('success');",
+          "    pm.expect(jsonData).to.have.property('message');",
+          "    pm.expect(jsonData).to.have.property('data');",
+          "    pm.expect(jsonData).to.have.property('errors');",
+          "});"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"tester@example.com\",\n  \"password\": \"password\",\n  \"device_name\": \"flutter-app\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "login"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.data && jsonData.data.token) {",
+                  "  pm.environment.set('token', jsonData.data.token);",
+                  "}",
+                  "pm.test('Login is successful', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(jsonData.success).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "logout"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Buildings",
+      "item": [
+        {"name":"List Buildings","request":{"method":"GET","url":{"raw":"{{baseUrl}}/api/v1/buildings","host":["{{baseUrl}}"],"path":["api","v1","buildings"]}}},
+        {"name":"Create Building","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"name\": \"Al Noor Building\",\n  \"real_estate_number\": \"RE-1001\",\n  \"license_number\": \"LIC-2026-01\",\n  \"total_floors\": 5,\n  \"has_basement\": true,\n  \"has_garage\": true,\n  \"ownership_type\": \"private\",\n  \"is_illegal\": false,\n  \"coordinates\": {\n    \"lat\": 33.3152,\n    \"lng\": 44.3661\n  }\n}"},"url":{"raw":"{{baseUrl}}/api/v1/buildings","host":["{{baseUrl}}"],"path":["api","v1","buildings"]}}},
+        {"name":"Show Building","request":{"method":"GET","url":{"raw":"{{baseUrl}}/api/v1/buildings/{{buildingId}}","host":["{{baseUrl}}"],"path":["api","v1","buildings","{{buildingId}}"]}}},
+        {"name":"Update Building","request":{"method":"PUT","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"name\": \"Al Noor Building Updated\",\n  \"total_floors\": 6\n}"},"url":{"raw":"{{baseUrl}}/api/v1/buildings/{{buildingId}}","host":["{{baseUrl}}"],"path":["api","v1","buildings","{{buildingId}}"]}}},
+        {"name":"Delete Building","request":{"method":"DELETE","url":{"raw":"{{baseUrl}}/api/v1/buildings/{{buildingId}}","host":["{{baseUrl}}"],"path":["api","v1","buildings","{{buildingId}}"]}}}
+      ]
+    },
+    {
+      "name": "Apartments",
+      "item": [
+        {"name":"List Apartments","request":{"method":"GET","url":{"raw":"{{baseUrl}}/api/v1/apartments","host":["{{baseUrl}}"],"path":["api","v1","apartments"]}}},
+        {"name":"Create Apartment","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"building_id\": {{buildingId}},\n  \"floor_type\": \"residential\",\n  \"water_meter\": \"WM-001\",\n  \"electricity_meter\": \"EM-001\",\n  \"landline\": \"123456789\",\n  \"is_sealed\": false\n}"},"url":{"raw":"{{baseUrl}}/api/v1/apartments","host":["{{baseUrl}}"],"path":["api","v1","apartments"]}}},
+        {"name":"Show Apartment","request":{"method":"GET","url":{"raw":"{{baseUrl}}/api/v1/apartments/{{apartmentId}}","host":["{{baseUrl}}"],"path":["api","v1","apartments","{{apartmentId}}"]}}},
+        {"name":"Update Apartment","request":{"method":"PUT","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"is_sealed\": true\n}"},"url":{"raw":"{{baseUrl}}/api/v1/apartments/{{apartmentId}}","host":["{{baseUrl}}"],"path":["api","v1","apartments","{{apartmentId}}"]}}},
+        {"name":"Delete Apartment","request":{"method":"DELETE","url":{"raw":"{{baseUrl}}/api/v1/apartments/{{apartmentId}}","host":["{{baseUrl}}"],"path":["api","v1","apartments","{{apartmentId}}"]}}}
+      ]
+    },
+    {
+      "name": "Families",
+      "item": [
+        {"name":"List Families","request":{"method":"GET","url":{"raw":"{{baseUrl}}/api/v1/families","host":["{{baseUrl}}"],"path":["api","v1","families"]}}},
+        {"name":"Create Family","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"apartment_id\": {{apartmentId}},\n  \"family_book\": \"FB-1001\",\n  \"health_status\": \"good\",\n  \"living_status\": \"resident\",\n  \"last_aid_date\": \"2026-03-01\",\n  \"unemployed_count\": 1,\n  \"students_count\": 2,\n  \"occupancy_type\": \"owner\"\n}"},"url":{"raw":"{{baseUrl}}/api/v1/families","host":["{{baseUrl}}"],"path":["api","v1","families"]}}},
+        {"name":"Show Family","request":{"method":"GET","url":{"raw":"{{baseUrl}}/api/v1/families/{{familyId}}","host":["{{baseUrl}}"],"path":["api","v1","families","{{familyId}}"]}}},
+        {"name":"Update Family","request":{"method":"PUT","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"students_count\": 3\n}"},"url":{"raw":"{{baseUrl}}/api/v1/families/{{familyId}}","host":["{{baseUrl}}"],"path":["api","v1","families","{{familyId}}"]}}},
+        {"name":"Delete Family","request":{"method":"DELETE","url":{"raw":"{{baseUrl}}/api/v1/families/{{familyId}}","host":["{{baseUrl}}"],"path":["api","v1","families","{{familyId}}"]}}}
+      ]
+    },
+    {
+      "name": "Shops",
+      "item": [
+        {"name":"List Shops","request":{"method":"GET","url":{"raw":"{{baseUrl}}/api/v1/shops","host":["{{baseUrl}}"],"path":["api","v1","shops"]}}},
+        {"name":"Create Shop","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"building_id\": {{buildingId}},\n  \"owner_family_id\": {{familyId}},\n  \"profession\": \"grocery\",\n  \"occupancy_type\": \"rent\"\n}"},"url":{"raw":"{{baseUrl}}/api/v1/shops","host":["{{baseUrl}}"],"path":["api","v1","shops"]}}},
+        {"name":"Show Shop","request":{"method":"GET","url":{"raw":"{{baseUrl}}/api/v1/shops/{{shopId}}","host":["{{baseUrl}}"],"path":["api","v1","shops","{{shopId}}"]}}},
+        {"name":"Update Shop","request":{"method":"PUT","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"profession\": \"pharmacy\"\n}"},"url":{"raw":"{{baseUrl}}/api/v1/shops/{{shopId}}","host":["{{baseUrl}}"],"path":["api","v1","shops","{{shopId}}"]}}},
+        {"name":"Delete Shop","request":{"method":"DELETE","url":{"raw":"{{baseUrl}}/api/v1/shops/{{shopId}}","host":["{{baseUrl}}"],"path":["api","v1","shops","{{shopId}}"]}}}
+      ]
+    },
+    {
+      "name": "Graves",
+      "item": [
+        {"name":"List Graves","request":{"method":"GET","url":{"raw":"{{baseUrl}}/api/v1/graves","host":["{{baseUrl}}"],"path":["api","v1","graves"]}}},
+        {"name":"Create Grave","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"family_id\": {{familyId}},\n  \"block_name\": \"A\",\n  \"row_number\": 12,\n  \"status\": \"available\"\n}"},"url":{"raw":"{{baseUrl}}/api/v1/graves","host":["{{baseUrl}}"],"path":["api","v1","graves"]}}},
+        {"name":"Show Grave","request":{"method":"GET","url":{"raw":"{{baseUrl}}/api/v1/graves/{{graveId}}","host":["{{baseUrl}}"],"path":["api","v1","graves","{{graveId}}"]}}},
+        {"name":"Update Grave","request":{"method":"PUT","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"status\": \"occupied\"\n}"},"url":{"raw":"{{baseUrl}}/api/v1/graves/{{graveId}}","host":["{{baseUrl}}"],"path":["api","v1","graves","{{graveId}}"]}}},
+        {"name":"Delete Grave","request":{"method":"DELETE","url":{"raw":"{{baseUrl}}/api/v1/graves/{{graveId}}","host":["{{baseUrl}}"],"path":["api","v1","graves","{{graveId}}"]}}}
+      ]
+    },
+    {
+      "name": "Complaints",
+      "item": [
+        {"name":"List Complaints","request":{"method":"GET","url":{"raw":"{{baseUrl}}/api/v1/complaints","host":["{{baseUrl}}"],"path":["api","v1","complaints"]}}},
+        {"name":"Create Complaint","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"family_id\": {{familyId}},\n  \"description\": \"Water leakage in apartment\",\n  \"ai_category\": \"infrastructure\",\n  \"priority\": \"high\",\n  \"status\": \"pending\"\n}"},"url":{"raw":"{{baseUrl}}/api/v1/complaints","host":["{{baseUrl}}"],"path":["api","v1","complaints"]}}},
+        {"name":"Show Complaint","request":{"method":"GET","url":{"raw":"{{baseUrl}}/api/v1/complaints/{{complaintId}}","host":["{{baseUrl}}"],"path":["api","v1","complaints","{{complaintId}}"]}}},
+        {"name":"Update Complaint","request":{"method":"PUT","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"status\": \"resolved\"\n}"},"url":{"raw":"{{baseUrl}}/api/v1/complaints/{{complaintId}}","host":["{{baseUrl}}"],"path":["api","v1","complaints","{{complaintId}}"]}}},
+        {"name":"Delete Complaint","request":{"method":"DELETE","url":{"raw":"{{baseUrl}}/api/v1/complaints/{{complaintId}}","host":["{{baseUrl}}"],"path":["api","v1","complaints","{{complaintId}}"]}}}
+      ]
+    }
+  ]
+}
