@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\ApiEnvelope;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -21,67 +22,56 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (ValidationException $exception, Request $request) {
-            if (! $request->is('api/*')) {
+            if (! ApiEnvelope::isApiRequest($request)) {
                 return null;
             }
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed.',
-                'data' => null,
-                'errors' => $exception->errors(),
-            ], 422);
+            return ApiEnvelope::error('Validation failed.', $exception->errors(), 422);
         });
 
         $exceptions->render(function (AuthenticationException $exception, Request $request) {
-            if (! $request->is('api/*')) {
+            if (! ApiEnvelope::isApiRequest($request)) {
                 return null;
             }
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthenticated.',
-                'data' => null,
-                'errors' => $exception->getMessage(),
-            ], 401);
+            $message = $exception->getMessage() !== ''
+                ? $exception->getMessage()
+                : 'Unauthenticated.';
+
+            return ApiEnvelope::error($message, null, 401);
         });
 
         $exceptions->render(function (NotFoundHttpException $exception, Request $request) {
-            if (! $request->is('api/*')) {
+            if (! ApiEnvelope::isApiRequest($request)) {
                 return null;
             }
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Resource not found.',
-                'data' => null,
-                'errors' => $exception->getMessage(),
-            ], 404);
+            return ApiEnvelope::error(
+                'Resource not found.',
+                $exception->getMessage() !== '' ? $exception->getMessage() : null,
+                404
+            );
         });
 
         $exceptions->render(function (HttpExceptionInterface $exception, Request $request) {
-            if (! $request->is('api/*')) {
+            if (! ApiEnvelope::isApiRequest($request)) {
                 return null;
             }
 
-            return response()->json([
-                'success' => false,
-                'message' => $exception->getMessage() !== '' ? $exception->getMessage() : 'Request failed.',
-                'data' => null,
-                'errors' => null,
-            ], $exception->getStatusCode());
+            $message = $exception->getMessage() !== '' ? $exception->getMessage() : 'Request failed.';
+
+            return ApiEnvelope::error($message, null, $exception->getStatusCode());
         });
 
-        $exceptions->render(function (\Throwable $exception, Request $request) {
-            if (! $request->is('api/*')) {
+        $exceptions->render(function (Throwable $exception, Request $request) {
+            if (! ApiEnvelope::isApiRequest($request)) {
                 return null;
             }
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Internal server error.',
-                'data' => null,
-                'errors' => app()->hasDebugModeEnabled() ? $exception->getMessage() : null,
-            ], 500);
+            return ApiEnvelope::error(
+                'Internal server error.',
+                app()->hasDebugModeEnabled() ? $exception->getMessage() : null,
+                500
+            );
         });
     })->create();

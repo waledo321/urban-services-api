@@ -17,6 +17,7 @@ class Family extends Model
      * @var list<string>
      */
     protected $fillable = [
+        'user_id',
         'apartment_id',
         'family_book',
         'health_status',
@@ -33,6 +34,7 @@ class Family extends Model
     protected function casts(): array
     {
         return [
+            'user_id' => 'integer',
             'apartment_id' => 'integer',
             'last_aid_date' => 'date',
             'unemployed_count' => 'integer',
@@ -43,6 +45,11 @@ class Family extends Model
     public function apartment(): BelongsTo
     {
         return $this->belongsTo(Apartment::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function shops(): HasMany

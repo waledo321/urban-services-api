@@ -70,6 +70,32 @@ class UnifiedApiResponseTest extends TestCase
             ->assertJsonPath('data', null);
     }
 
+    public function test_login_failure_returns_unified_response_structure(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'tester@example.com',
+            'password' => 'password',
+        ]);
+
+        $response = $this->postJson('/api/v1/login', [
+            'email' => $user->email,
+            'password' => 'wrong-password',
+        ]);
+
+        $response
+            ->assertStatus(401)
+            ->assertJsonStructure([
+                'success',
+                'message',
+                'data',
+                'errors',
+            ])
+            ->assertJsonPath('success', false)
+            ->assertJsonPath('message', 'Invalid credentials.')
+            ->assertJsonPath('data', null)
+            ->assertJsonPath('errors', null);
+    }
+
     public function test_login_success_returns_unified_response_payload_shape(): void
     {
         $user = User::factory()->create([
