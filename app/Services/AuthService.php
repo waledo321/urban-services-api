@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Hash;
 class AuthService
 {
     /**
-     * @param  array{email: string, password: string, device_name?: string|null}  $credentials
+     * @param  array{email: string, password: string, fcm_token?: string|null}  $credentials
      * @return array{token: string, token_type: string, user: User}
      */
     public function login(array $credentials): array
@@ -21,8 +21,14 @@ class AuthService
             abort(401, 'Invalid credentials.');
         }
 
-        $deviceName = $credentials['device_name'] ?? 'api-client';
-        $token = $user->createToken($deviceName)->plainTextToken;
+        $fcmToken = $credentials['fcm_token'] ?? null;
+        if (is_string($fcmToken) && $fcmToken !== '') {
+            $user->forceFill(['fcm_token' => $fcmToken])->save();
+        }
+
+        $token = $user->createToken('mobile-app')->plainTextToken;
+
+        $user->refresh();
 
         return [
             'token' => $token,

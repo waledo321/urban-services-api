@@ -21,6 +21,7 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'email_verified_at' => $this->email_verified_at,
+            'has_fcm_token' => filled($this->resource->fcm_token),
         ];
     }
 }

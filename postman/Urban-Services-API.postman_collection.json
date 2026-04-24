@@ -50,7 +50,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"tester@example.com\",\n  \"password\": \"password\",\n  \"device_name\": \"flutter-app\"\n}"
+              "raw": "{\n  \"email\": \"tester@example.com\",\n  \"password\": \"password\",\n  \"fcm_token\": \"optional-send-firebase-device-token-here\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/login",
@@ -132,7 +132,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"tester@example.com\",\n  \"password\": \"wrong-password\",\n  \"device_name\": \"flutter-app\"\n}"
+              "raw": "{\n  \"email\": \"tester@example.com\",\n  \"password\": \"wrong-password\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/v1/login",
@@ -224,6 +224,55 @@
         {"name":"Show Complaint","request":{"method":"GET","url":{"raw":"{{baseUrl}}/api/v1/complaints/{{complaintId}}","host":["{{baseUrl}}"],"path":["api","v1","complaints","{{complaintId}}"]}}},
         {"name":"Update Complaint","request":{"method":"PUT","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"status\": \"resolved\"\n}"},"url":{"raw":"{{baseUrl}}/api/v1/complaints/{{complaintId}}","host":["{{baseUrl}}"],"path":["api","v1","complaints","{{complaintId}}"]}}},
         {"name":"Delete Complaint","request":{"method":"DELETE","url":{"raw":"{{baseUrl}}/api/v1/complaints/{{complaintId}}","host":["{{baseUrl}}"],"path":["api","v1","complaints","{{complaintId}}"]}}}
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Update FCM token",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fcm_token\": \"replace-with-device-token-from-flutter\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notifications/fcm-token",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notifications",
+                "fcm-token"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "pm.test('FCM token response is unified', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(jsonData).to.have.property('success');",
+                  "  pm.expect(jsonData.success).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
       ]
     }
   ]

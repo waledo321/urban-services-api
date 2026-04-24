@@ -106,7 +106,6 @@ class UnifiedApiResponseTest extends TestCase
         $response = $this->postJson('/api/v1/login', [
             'email' => $user->email,
             'password' => 'password',
-            'device_name' => 'phpunit',
         ]);
 
         $response
@@ -121,6 +120,7 @@ class UnifiedApiResponseTest extends TestCase
                         'id',
                         'name',
                         'email',
+                        'has_fcm_token',
                     ],
                 ],
                 'errors',
@@ -129,6 +129,30 @@ class UnifiedApiResponseTest extends TestCase
             ->assertJsonPath('message', 'Login successful.')
             ->assertJsonPath('data.token_type', 'Bearer')
             ->assertJsonPath('data.user.email', $user->email)
+            ->assertJsonPath('data.user.has_fcm_token', false)
             ->assertJsonPath('errors', null);
+    }
+
+    public function test_login_with_optional_fcm_token_persists_and_returns_has_fcm_token(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'fcm-tester@example.com',
+            'password' => 'password',
+            'fcm_token' => null,
+        ]);
+
+        $deviceToken = 'test-fcm-token-from-flutter-login';
+
+        $response = $this->postJson('/api/v1/login', [
+            'email' => $user->email,
+            'password' => 'password',
+            'fcm_token' => $deviceToken,
+        ]);
+
+        $response
+            ->assertStatus(200)
+            ->assertJsonPath('data.user.has_fcm_token', true);
+
+        $this->assertSame($deviceToken, $user->fresh()->fcm_token);
     }
 }

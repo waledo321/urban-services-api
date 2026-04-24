@@ -57,9 +57,12 @@ Request body:
 {
   "email": "tester@example.com",
   "password": "password",
-  "device_name": "flutter-app"
+  "fcm_token": "optional-firebase-cloud-messaging-device-token"
 }
 ```
+
+- `fcm_token` is optional. When sent with valid credentials, it is saved on the user (same as `PATCH /api/v1/notifications/fcm-token` after login).
+- The raw token is never returned in JSON; use `has_fcm_token` to see if the server has a token stored.
 
 Success response data shape:
 
@@ -70,7 +73,8 @@ Success response data shape:
   "user": {
     "id": 1,
     "name": "Test User",
-    "email": "tester@example.com"
+    "email": "tester@example.com",
+    "has_fcm_token": true
   }
 }
 ```
@@ -88,6 +92,7 @@ All routes below require Bearer token:
 - `shops`
 - `graves`
 - `complaints`
+- `PATCH /api/v1/notifications/fcm-token` (update FCM device token when it rotates)
 
 Each resource supports full REST actions:
 - `GET /api/v1/{resource}` (index)

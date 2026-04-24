@@ -1,0 +1,8 @@
+# Use this workspace to collaborate
+workspace:
+  id: 5b8d11b5-1aca-407b-8de9-44e96007c65b
+
+localResources:
+  specs:
+    - ..\vendor\google\grpc-gcp\src\grpc_gcp.proto
+    - ..\vendor\google\gax\src\Testing\mocks.proto
